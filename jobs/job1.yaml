@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: paral-1
+spec:
+  completions: 8
+  parallelism: 2
+  template:
+    spec:
+      containers:
+        - name: paral-1-name
+          image: ubuntu
+          command: ["/bin/bash"]
+          args: ["-c", "sleep 30; date"]
+      restartPolicy: OnFailure
