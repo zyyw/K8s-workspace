@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+spec:
+  selector:
+    matchLabels:
+      app: petclinic
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+        - name: petclinic
+          image: spring2go/spring-petclinic:1.0.0.RELEASE
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: petclinic-configmap
+                  key: SPRING_PROFILES_ACTIVE
+            - name: DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: petclinic-configmap
+                  key: DATASOURCE_URL
+
+            - name: DATASOURCE_INIT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: petclinic-configmap
+                  key: DATASOURCE_INIT_MODE
+
+            - name: TEST_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: petclinic-configmap
+                  key: TEST_CONFIG
+            - name: DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: petclinic-secret
+                  key: DATASOURCE_USERNAME
+
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: petclinic-secret
+                  key: DATASOURCE_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 31080
+  selector:
+    app: petclinic
+  type: NodePort
